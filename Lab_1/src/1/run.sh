@@ -1,5 +1,9 @@
 #!/bin/bash
-FILE="metrics.txt"
+
+
+FILE="metrics/${1}.txt"
+
+
 
 if [ -f $FILE ]; then
   rm $FILE
@@ -7,7 +11,7 @@ fi
 
 for i in {1..10}
 do
-   result+=($(./phods))
+   result+=($(./${1}))
 done
 
 
@@ -28,7 +32,9 @@ do
 
 done
 avg=$(echo $avg / 10 | bc -l)
+echo ${1}
 echo "min: " ${min} >> $FILE
 echo "max: " ${max} >> $FILE
 echo "avg: " ${avg} >> $FILE
 cat $FILE
+echo
