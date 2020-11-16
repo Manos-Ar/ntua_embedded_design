@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #define N 144     /*Frame dimension for QCIF format*/
 #define M 176     /*Frame dimension for QCIF format*/
@@ -11,7 +12,7 @@
                     original location of the block.*/
 
 void read_sequence(int current[N][M], int previous[N][M])
-{ 
+{
 	FILE *picture0, *picture1;
 	int i, j;
 
@@ -21,7 +22,7 @@ void read_sequence(int current[N][M], int previous[N][M])
 		exit(-1);
 	}
 
-	if((picture1=fopen("akiyo1.y","rb")) == NULL) 
+	if((picture1=fopen("akiyo1.y","rb")) == NULL)
 	{
 		printf("Current frame doesn't exist.\n");
 		exit(-1);
@@ -81,12 +82,12 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
         min2 = 255*B*B;
 
         /*For all candidate blocks in X dimension*/
-        for(i=-S; i<S+1; i+=S)     
+        for(i=-S; i<S+1; i+=S)
         {
           distx = 0;
 
           /*For all pixels in the block*/
-          for(k=0; k<B; k++)     
+          for(k=0; k<B; k++)
           {
             for(l=0; l<B; l++)
             {
@@ -114,12 +115,12 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
         }
 
         /*For all candidate blocks in Y dimension*/
-        for(i=-S; i<S+1; i+=S)     
+        for(i=-S; i<S+1; i+=S)
         {
           disty = 0;
 
           /*For all pixels in the block*/
-          for(k=0; k<B; k++)     
+          for(k=0; k<B; k++)
           {
             for(l=0; l<B; l++)
             {
@@ -152,15 +153,23 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
       }
     }
   }
-} 
+}
 
 int main()
-{  
+{
   int current[N][M], previous[N][M], motion_vectors_x[N/B][M/B],
       motion_vectors_y[N/B][M/B], i, j;
 
-	read_sequence(current,previous);
-  phods_motion_estimation(current,previous,motion_vectors_x,motion_vectors_y);
+  double time;
+  struct timeval ts,tf;
 
+	read_sequence(current,previous);
+
+  gettimeofday(&ts,NULL);
+  phods_motion_estimation(current,previous,motion_vectors_x,motion_vectors_y);
+  gettimeofday(&tf,NULL);
+
+  time=(tf.tv_sec-ts.tv_sec)+(tf.tv_usec-ts.tv_usec)*0.000001;
+  printf("%lf\n",time);
   return 0;
 }
