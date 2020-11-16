@@ -1,28 +1,34 @@
 #!/bin/bash
+FILE="metrics.txt"
+
+if [ -f $FILE ]; then
+  rm $FILE
+fi
 
 for i in {1..10}
 do
    result+=($(./phods))
 done
 
-echo "${result[@]}"
 
 avg=0
 max=${result[0]}
 min=${result[0]}
-echo $min $max $avg
 
-for x in "${result[@]}";
+for x in ${result[@]};
 do
   avg=$(echo $avg + $x | bc -l)
-  # echo $avg
-  if [[ "$max" < "$x" ]]; then
+  if [ "$max" -lt "$x" ]; then
     max=${x}
   fi
 
-  if [[ "$min" > "$x" ]]; then
+  if [ "$min" -gt "$x" ]; then
     min=${x}
   fi
+
 done
 avg=$(echo $avg / 10 | bc -l)
-echo $min $max $avg
+echo "min: " ${min} >> $FILE
+echo "max: " ${max} >> $FILE
+echo "avg: " ${avg} >> $FILE
+cat $FILE

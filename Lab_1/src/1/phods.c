@@ -160,7 +160,7 @@ int main()
   int current[N][M], previous[N][M], motion_vectors_x[N/B][M/B],
       motion_vectors_y[N/B][M/B], i, j;
 
-  double time;
+  int time;
   struct timeval ts,tf;
 
 	read_sequence(current,previous);
@@ -169,7 +169,7 @@ int main()
   phods_motion_estimation(current,previous,motion_vectors_x,motion_vectors_y);
   gettimeofday(&tf,NULL);
 
-  time=(tf.tv_sec-ts.tv_sec)+(tf.tv_usec-ts.tv_usec)*0.000001;
-  printf("%lf\n",time);
+  time=(tf.tv_sec-ts.tv_sec)*1000000+(tf.tv_usec-ts.tv_usec);
+  printf("%d\n",time);
   return 0;
 }
