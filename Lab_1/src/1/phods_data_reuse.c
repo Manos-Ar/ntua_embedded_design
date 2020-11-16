@@ -56,6 +56,8 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
 {
   int x, y, i, j, k, l, p1, p2, q2, distx, disty, S, min1, min2, bestx, besty;
 
+  int reuse_x, reuse_y;
+
   distx = 0;
   disty = 0;
 
@@ -75,7 +77,8 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
     for(y=0; y<M/B; y++)
     {
       S = 4;
-
+      reuse_x = B*x + vectors_x[x][y];
+      reuse_y = B*y + vectors_y[x][y];
       while(S > 0)
       {
         min1 = 255*B*B;
@@ -94,14 +97,14 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
             {
               p1 = current[B*x+k][B*y+l];
 
-              if((B*x + vectors_x[x][y] + i + k) < 0 ||
-                  (B*x + vectors_x[x][y] + i + k) > (N-1) ||
-                  (B*y + vectors_y[x][y] + l) < 0 ||
-                  (B*y + vectors_y[x][y] + l) > (M-1))
+              if((reuse_x + i + k) < 0 ||
+                  (reuse_x + i + k) > (N-1) ||
+                  (reuse_y + l) < 0 ||
+                  (reuse_y + l) > (M-1))
               {
                 p2 = 0;
               } else {
-                p2 = previous[B*x+vectors_x[x][y]+i+k][B*y+vectors_y[x][y]+l];
+                p2 = previous[reuse_x+i+k][reuse_y+l];
               }
 
               distx += abs(p1-p2);
@@ -115,14 +118,14 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
 ////////////////////////////////////////////////
               p1 = current[B*x+k][B*y+l];
 
-              if((B*x + vectors_x[x][y] + k) <0 ||
-                  (B*x + vectors_x[x][y] + k) > (N-1) ||
-                  (B*y + vectors_y[x][y] + i + l) < 0 ||
-                  (B*y + vectors_y[x][y] + i + l) > (M-1))
+              if((reuse_x + k) <0 ||
+                  (reuse_x + k) > (N-1) ||
+                  (reuse_y + i + l) < 0 ||
+                  (reuse_y + i + l) > (M-1))
               {
                 q2 = 0;
               } else {
-                q2 = previous[B*x+vectors_x[x][y]+k][B*y+vectors_y[x][y]+i+l];
+                q2 = previous[reuse_x+k][reuse_y+i+l];
               }
 
               disty += abs(p1-q2);

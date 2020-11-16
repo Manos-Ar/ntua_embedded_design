@@ -11,7 +11,7 @@ fi
 
 for i in {1..10}
 do
-   result+=($(./${1}))
+   result+=($(./${1}.out))
 done
 
 

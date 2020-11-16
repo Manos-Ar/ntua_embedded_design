@@ -1,6 +1,6 @@
 #!/bin/bash
 
-exec=( "phods" "phods_fusion" )
+exec=( "phods" "phods_fusion" "phods_unroll"  "phods_data_reuse" )
 
 dir="metrics"
 

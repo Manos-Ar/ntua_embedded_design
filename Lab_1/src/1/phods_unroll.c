@@ -11,6 +11,60 @@
 #define p 7       /*Search space. Restricted in a [-p,p] region around the
                     original location of the block.*/
 
+
+#define LOOP_INNER(i){ \
+  distx = 0; \
+  disty = 0; \
+  for(k=0; k<B; k++)  \
+  { \
+    for(l=0; l<B; l++) \
+    { \
+      p1 = current[B*x+k][B*y+l]; \
+      if((B*x + vectors_x[x][y] + i + k) < 0 ||  \
+          (B*x + vectors_x[x][y] + i + k) > (N-1) || \
+          (B*y + vectors_y[x][y] + l) < 0 || \
+          (B*y + vectors_y[x][y] + l) > (M-1)) \
+      {  \
+        p2 = 0; \
+      } else { \
+        p2 = previous[B*x+vectors_x[x][y]+i+k][B*y+vectors_y[x][y]+l]; \
+      } \
+      distx += abs(p1-p2); \
+      if(distx < min1) \
+      { \
+        min1 = distx; \
+        bestx = i; \
+      } \
+      p1 = current[B*x+k][B*y+l]; \
+      if((B*x + vectors_x[x][y] + k) <0 || \
+          (B*x + vectors_x[x][y] + k) > (N-1) || \
+          (B*y + vectors_y[x][y] + i + l) < 0 || \
+          (B*y + vectors_y[x][y] + i + l) > (M-1)) \
+      { \
+        q2 = 0; \
+      } else { \
+        q2 = previous[B*x+vectors_x[x][y]+k][B*y+vectors_y[x][y]+i+l]; \
+      } \
+      disty += abs(p1-q2); \
+    } \
+  } \
+  if(disty < min2) \
+  { \
+    min2 = disty; \
+    besty = i; \
+  } \
+}
+
+#define LOOP_OUTER(S){\
+	min1 = 255 * B * B;\
+	min2 = 255 * B * B;\
+	LOOP_INNER(-S);\
+	LOOP_INNER(0);\
+	LOOP_INNER(S);\
+	vectors_x[x][y] += bestx;\
+	vectors_y[x][y] += besty;\
+}
+
 void read_sequence(int current[N][M], int previous[N][M])
 {
 	FILE *picture0, *picture1;
@@ -54,7 +108,7 @@ void read_sequence(int current[N][M], int previous[N][M])
 void phods_motion_estimation(int current[N][M], int previous[N][M],
     int vectors_x[N/B][M/B],int vectors_y[N/B][M/B])
 {
-  int x, y, i, j, k, l, p1, p2, q2, distx, disty, S, min1, min2, bestx, besty;
+  int x, y, i, j, k, l, p1, p2, q2, distx, disty, min1, min2, bestx, besty;
 
   distx = 0;
   disty = 0;
@@ -74,73 +128,9 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
   {
     for(y=0; y<M/B; y++)
     {
-      S = 4;
-
-      while(S > 0)
-      {
-        min1 = 255*B*B;
-        min2 = 255*B*B;
-
-        /*For all candidate blocks in X dimension*/
-        for(i=-S; i<S+1; i+=S)
-        {
-          distx = 0;
-          disty = 0;
-
-          /*For all pixels in the block*/
-          for(k=0; k<B; k++)
-          {
-            for(l=0; l<B; l++)
-            {
-              p1 = current[B*x+k][B*y+l];
-
-              if((B*x + vectors_x[x][y] + i + k) < 0 ||
-                  (B*x + vectors_x[x][y] + i + k) > (N-1) ||
-                  (B*y + vectors_y[x][y] + l) < 0 ||
-                  (B*y + vectors_y[x][y] + l) > (M-1))
-              {
-                p2 = 0;
-              } else {
-                p2 = previous[B*x+vectors_x[x][y]+i+k][B*y+vectors_y[x][y]+l];
-              }
-
-              distx += abs(p1-p2);
-
-              if(distx < min1)
-              {
-                min1 = distx;
-                bestx = i;
-              }
-
-////////////////////////////////////////////////
-              p1 = current[B*x+k][B*y+l];
-
-              if((B*x + vectors_x[x][y] + k) <0 ||
-                  (B*x + vectors_x[x][y] + k) > (N-1) ||
-                  (B*y + vectors_y[x][y] + i + l) < 0 ||
-                  (B*y + vectors_y[x][y] + i + l) > (M-1))
-              {
-                q2 = 0;
-              } else {
-                q2 = previous[B*x+vectors_x[x][y]+k][B*y+vectors_y[x][y]+i+l];
-              }
-
-              disty += abs(p1-q2);
-
-            }
-          }
-
-          if(disty < min2)
-          {
-            min2 = disty;
-            besty = i;
-          }
-        }
-
-        S = S/2;
-        vectors_x[x][y] += bestx;
-        vectors_y[x][y] += besty;
-      }
+      LOOP_OUTER(4);
+      LOOP_OUTER(2);
+      LOOP_OUTER(1);
     }
   }
 }
