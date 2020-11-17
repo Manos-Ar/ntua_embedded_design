@@ -10,7 +10,7 @@
 #define p 7       /*Search space. Restricted in a [-p,p] region around the
                     original location of the block.*/
 
-int B;
+int Bx,By;
 
 void read_sequence(int current[N][M], int previous[N][M])
 {
@@ -53,7 +53,7 @@ void read_sequence(int current[N][M], int previous[N][M])
 
 
 void phods_motion_estimation(int current[N][M], int previous[N][M],
-    int vectors_x[N/B][M/B],int vectors_y[N/B][M/B])
+    int vectors_x[N/Bx][M/By],int vectors_y[N/Bx][M/By])
 {
   int x, y, i, j, k, l, p1, p2, q2, distx, disty, S, min1, min2, bestx, besty;
 
@@ -63,9 +63,9 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
   disty = 0;
 
   /*Initialize the vector motion matrices*/
-  for(i=0; i<N/B; i++)
+  for(i=0; i<N/Bx; i++)
   {
-    for(j=0; j<M/B; j++)
+    for(j=0; j<M/By; j++)
     {
       vectors_x[i][j] = 0;
       vectors_y[i][j] = 0;
@@ -73,17 +73,17 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
   }
 
   /*For all blocks in the current frame*/
-  for(x=0; x<N/B; x++)
+  for(x=0; x<N/Bx; x++)
   {
-    for(y=0; y<M/B; y++)
+    for(y=0; y<M/By; y++)
     {
       S = 4;
-      reuse_x = B*x + vectors_x[x][y];
-      reuse_y = B*y + vectors_y[x][y];
+      reuse_x = Bx*x + vectors_x[x][y];
+      reuse_y = By*y + vectors_y[x][y];
       while(S > 0)
       {
-        min1 = 255*B*B;
-        min2 = 255*B*B;
+        min1 = 255*Bx*By;
+        min2 = 255*Bx*By;
 
         /*For all candidate blocks in X dimension*/
         for(i=-S; i<S+1; i+=S)
@@ -92,11 +92,11 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
           disty = 0;
 
           /*For all pixels in the block*/
-          for(k=0; k<B; k++)
+          for(k=0; k<Bx; k++)
           {
-            for(l=0; l<B; l++)
+            for(l=0; l<By; l++)
             {
-              p1 = current[B*x+k][B*y+l];
+              p1 = current[Bx*x+k][By*y+l];
 
               if((reuse_x + i + k) < 0 ||
                   (reuse_x + i + k) > (N-1) ||
@@ -117,7 +117,7 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
               }
 
 ////////////////////////////////////////////////
-              p1 = current[B*x+k][B*y+l];
+              p1 = current[Bx*x+k][By*y+l];
 
               if((reuse_x + k) <0 ||
                   (reuse_x + k) > (N-1) ||
@@ -152,18 +152,20 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
 int main(int argc, char *argv[])
 {
   if( argc < 2 )
-    B = 16;
+    Bx = By = 16;
   else if (argc==2)
-    B = atoi(argv[2]);
+    Bx = By = atoi(argv[1]);
+  else if (argc==3){
+    Bx = atoi(argv[1]);
+    Bx = atoi(argv[2]);
+  }
   else
     exit(-1);
 
-
-  int current[N][M], previous[N][M], motion_vectors_x[N/B][M/B],
-      motion_vectors_y[N/B][M/B];
+  int current[N][M], previous[N][M], motion_vectors_x[N/Bx][M/By],
+      motion_vectors_y[N/Bx][M/By];
 
   int time;
-
   struct timeval ts,tf;
 
 	read_sequence(current,previous);
