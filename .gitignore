@@ -1,6 +1,7 @@
 /Lab_1/src/1/*.out
 /Lab_1/src/1/output*
 /Lab_1/src/1/metrics/
+/Lab_1/src/1/plots/
 
 /Lab_1/src/2/metrics/
 /Lab_1/src/2/*.log
