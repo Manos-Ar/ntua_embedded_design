@@ -1,3 +1,9 @@
 /Lab_1/src/1/*.out
 /Lab_1/src/1/output*
 /Lab_1/src/1/metrics/
+
+/Lab_1/src/2/metrics/
+/Lab_1/src/2/*.log
+/Lab_1/src/2/*.o
+/Lab_1/src/2/*.json
+/Lab_1/src/2/*.out

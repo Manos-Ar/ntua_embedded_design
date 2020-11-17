@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
   gettimeofday(&tf,NULL);
 
   time=(tf.tv_sec-ts.tv_sec)*1000000+(tf.tv_usec-ts.tv_usec);
-  printf("%d\n",time);  // output=fopen(file,"w");
+  printf("%d\n",time);
 
   // print_table("outputs/output_phods_",argc,Bx,By,N,M,current,previous);
 
