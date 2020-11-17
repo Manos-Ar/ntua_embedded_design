@@ -7,9 +7,11 @@
 
 #define N 144     /*Frame dimension for QCIF format*/
 #define M 176     /*Frame dimension for QCIF format*/
-#define B 16      /*Block size*/
+// #define B 16      /*Block size*/
 #define p 7       /*Search space. Restricted in a [-p,p] region around the
                     original location of the block.*/
+
+int B;
 
 void read_sequence(int current[N][M], int previous[N][M])
 {
@@ -155,12 +157,21 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
   }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+  if( argc < 2 )
+    B = 16;
+  else if (argc==2)
+    B = atoi(argv[2]);
+  else
+    exit(-1);
+
+
   int current[N][M], previous[N][M], motion_vectors_x[N/B][M/B],
       motion_vectors_y[N/B][M/B];
 
   int time;
+
   struct timeval ts,tf;
 
 	read_sequence(current,previous);
@@ -170,6 +181,6 @@ int main()
   gettimeofday(&tf,NULL);
 
   time=(tf.tv_sec-ts.tv_sec)*1000000+(tf.tv_usec-ts.tv_usec);
-  printf("%d\n",time);
+  printf("%d",time);
   return 0;
 }

@@ -7,10 +7,10 @@
 
 #define N 144     /*Frame dimension for QCIF format*/
 #define M 176     /*Frame dimension for QCIF format*/
-#define B 16      /*Block size*/
 #define p 7       /*Search space. Restricted in a [-p,p] region around the
                     original location of the block.*/
 
+int B;
 
 #define LOOP_INNER(i){ \
   distx = 0; \
@@ -135,8 +135,15 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
   }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+  if( argc < 2 )
+    B = 16;
+  else if (argc==2)
+    B = atoi(argv[2]);
+  else
+    exit(-1);
+
   int current[N][M], previous[N][M], motion_vectors_x[N/B][M/B],
       motion_vectors_y[N/B][M/B];
 
