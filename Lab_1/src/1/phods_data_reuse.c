@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include "print.h"
 
 #define N 144     /*Frame dimension for QCIF format*/
 #define M 176     /*Frame dimension for QCIF format*/
@@ -11,6 +12,60 @@
                     original location of the block.*/
 
 int Bx,By;
+
+
+#define LOOP_INNER(i){ \
+  distx = 0; \
+  disty = 0; \
+  for(k=0; k<Bx; k++)  \
+  { \
+    for(l=0; l<By; l++) \
+    { \
+      p1 = current[Bx*x+k][By*y+l]; \
+      if((reuse_x + i + k) < 0 ||  \
+          (reuse_x + i + k) > (N-1) || \
+          (reuse_y + l) < 0 || \
+          (reuse_y + l) > (M-1)) \
+      {  \
+        p2 = 0; \
+      } else { \
+        p2 = previous[reuse_x+i+k][reuse_y+l]; \
+      } \
+      distx += abs(p1-p2); \
+      if(distx < min1) \
+      { \
+        min1 = distx; \
+        bestx = i; \
+      } \
+      p1 = current[Bx*x+k][By*y+l]; \
+      if((reuse_x + k) <0 || \
+          (reuse_x + k) > (N-1) || \
+          (reuse_y + i + l) < 0 || \
+          (reuse_y + i + l) > (M-1)) \
+      { \
+        q2 = 0; \
+      } else { \
+        q2 = previous[reuse_x+k][reuse_y+i+l]; \
+      } \
+      disty += abs(p1-q2); \
+    } \
+  } \
+  if(disty < min2) \
+  { \
+    min2 = disty; \
+    besty = i; \
+  } \
+}
+
+#define LOOP_OUTER(S){\
+	min1 = 255 * Bx * By;\
+	min2 = 255 * Bx * By;\
+	LOOP_INNER(-S);\
+	LOOP_INNER(0);\
+	LOOP_INNER(S);\
+	vectors_x[x][y] += bestx;\
+	vectors_y[x][y] += besty;\
+}
 
 void read_sequence(int current[N][M], int previous[N][M])
 {
@@ -55,7 +110,7 @@ void read_sequence(int current[N][M], int previous[N][M])
 void phods_motion_estimation(int current[N][M], int previous[N][M],
     int vectors_x[N/Bx][M/By],int vectors_y[N/Bx][M/By])
 {
-  int x, y, i, j, k, l, p1, p2, q2, distx, disty, S, min1, min2, bestx, besty;
+  int x, y, i, j, k, l, p1, p2, q2, distx, disty, min1, min2, bestx, besty;
 
   int reuse_x, reuse_y;
 
@@ -77,74 +132,11 @@ void phods_motion_estimation(int current[N][M], int previous[N][M],
   {
     for(y=0; y<M/By; y++)
     {
-      S = 4;
       reuse_x = Bx*x + vectors_x[x][y];
       reuse_y = By*y + vectors_y[x][y];
-      while(S > 0)
-      {
-        min1 = 255*Bx*By;
-        min2 = 255*Bx*By;
-
-        /*For all candidate blocks in X dimension*/
-        for(i=-S; i<S+1; i+=S)
-        {
-          distx = 0;
-          disty = 0;
-
-          /*For all pixels in the block*/
-          for(k=0; k<Bx; k++)
-          {
-            for(l=0; l<By; l++)
-            {
-              p1 = current[Bx*x+k][By*y+l];
-
-              if((reuse_x + i + k) < 0 ||
-                  (reuse_x + i + k) > (N-1) ||
-                  (reuse_y + l) < 0 ||
-                  (reuse_y + l) > (M-1))
-              {
-                p2 = 0;
-              } else {
-                p2 = previous[reuse_x+i+k][reuse_y+l];
-              }
-
-              distx += abs(p1-p2);
-
-              if(distx < min1)
-              {
-                min1 = distx;
-                bestx = i;
-              }
-
-////////////////////////////////////////////////
-              p1 = current[Bx*x+k][By*y+l];
-
-              if((reuse_x + k) <0 ||
-                  (reuse_x + k) > (N-1) ||
-                  (reuse_y + i + l) < 0 ||
-                  (reuse_y + i + l) > (M-1))
-              {
-                q2 = 0;
-              } else {
-                q2 = previous[reuse_x+k][reuse_y+i+l];
-              }
-
-              disty += abs(p1-q2);
-
-            }
-          }
-
-          if(disty < min2)
-          {
-            min2 = disty;
-            besty = i;
-          }
-        }
-
-        S = S/2;
-        vectors_x[x][y] += bestx;
-        vectors_y[x][y] += besty;
-      }
+      LOOP_OUTER(4);
+      LOOP_OUTER(2);
+      LOOP_OUTER(1);
     }
   }
 }
@@ -157,7 +149,7 @@ int main(int argc, char *argv[])
     Bx = By = atoi(argv[1]);
   else if (argc==3){
     Bx = atoi(argv[1]);
-    Bx = atoi(argv[2]);
+    By = atoi(argv[2]);
   }
   else
     exit(-1);
@@ -176,5 +168,7 @@ int main(int argc, char *argv[])
 
   time=(tf.tv_sec-ts.tv_sec)*1000000+(tf.tv_usec-ts.tv_usec);
   printf("%d\n",time);
+
+  // print_table("outputs/output_phods_unroll_",argc,Bx,By,N,M,current,previous);
   return 0;
 }

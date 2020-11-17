@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include "print.h"
 
 #define N 144     /*Frame dimension for QCIF format*/
 #define M 176     /*Frame dimension for QCIF format*/
@@ -12,6 +13,7 @@
                     original location of the block.*/
 
 int Bx,By;
+
 
 void read_sequence(int current[N][M], int previous[N][M])
 {
@@ -165,7 +167,7 @@ int main(int argc, char *argv[])
     Bx = By = atoi(argv[1]);
   else if (argc==3){
     Bx = atoi(argv[1]);
-    Bx = atoi(argv[2]);
+    By = atoi(argv[2]);
   }
   else
     exit(-1);
@@ -183,6 +185,9 @@ int main(int argc, char *argv[])
   gettimeofday(&tf,NULL);
 
   time=(tf.tv_sec-ts.tv_sec)*1000000+(tf.tv_usec-ts.tv_usec);
-  printf("%d\n",time);
+  printf("%d\n",time);  // output=fopen(file,"w");
+
+  // print_table("outputs/output_phods_",argc,Bx,By,N,M,current,previous);
+
   return 0;
 }

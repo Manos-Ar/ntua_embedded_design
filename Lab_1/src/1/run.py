@@ -10,8 +10,12 @@ exec=["phods", "phods_fusion", "phods_unroll", "phods_data_reuse"]
 
 if path.isdir("metrics/"):
     shutil.rmtree("metrics/")
-
 os.mkdir("metrics")
+
+# if path.isdir("outputs/"):
+#     shutil.rmtree("outputs/")
+#     os.mkdir("outputs")
+
 
 for e in exec:
     times=[]

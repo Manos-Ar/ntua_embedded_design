@@ -6,7 +6,7 @@ import subprocess
 import statistics
 import shutil
 
-exec=["phods", "phods_fusion", "phods_unroll", "phods_data_reuse"]
+exec=["phods_data_reuse"]
 block=[1,2,4,8,16]
 if not(path.isdir("metrics/")):
     exit()
@@ -17,7 +17,7 @@ for e in exec:
     for b in block:
         times=[]
         for i in range(0,10):
-            p = subprocess.Popen(["./"+e+".out",str(b)], stdout=subprocess.PIPE, shell=True)
+            p = subprocess.Popen("./"+e+".out "+str(b), stdout=subprocess.PIPE, shell=True)
             (output, err) = p.communicate()
             p_status = p.wait()
             output = int(output)

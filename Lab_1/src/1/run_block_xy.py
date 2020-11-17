@@ -6,7 +6,7 @@ import subprocess
 import statistics
 import shutil
 
-exec=["phods", "phods_fusion", "phods_unroll", "phods_data_reuse"]
+exec=["phods_data_reuse"]
 
 block_x=[1, 2, 3, 4, 6, 8, 9, 12, 16, 18, 24, 36, 48, 72, 144]
 block_y=[1, 2, 4, 8, 11, 16, 22, 44, 88, 176]
@@ -20,9 +20,11 @@ for e in exec:
         for by in block_y:
             times=[]
             for i in range(0,10):
-                p = subprocess.Popen(["./"+e+".out",str(bx),str(by)], stdout=subprocess.PIPE, shell=True)
+                # print(i,bx,by,str(e))
+                p = subprocess.Popen("./"+e+".out "+str(bx)+" "+str(by), stdout=subprocess.PIPE, shell=True)
                 (output, err) = p.communicate()
                 p_status = p.wait()
+                # print(output)
                 output = int(output)
                 times.append(output)
 
