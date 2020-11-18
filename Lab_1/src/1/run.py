@@ -16,9 +16,8 @@ if path.isdir("metrics/"):
     shutil.rmtree("metrics/")
 os.mkdir("metrics")
 
-if path.isdir("plots/"):
-    shutil.rmtree("plots/")
-os.mkdir("plots")
+if not path.isdir("plots/"):
+    os.mkdir("plots")
 
 data = []
 
