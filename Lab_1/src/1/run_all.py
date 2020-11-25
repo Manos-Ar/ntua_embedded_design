@@ -215,23 +215,23 @@ ax.set_yticklabels(block_y, rotation=0)
 
 ax.set_xlabel("Bx Size",fontsize=16)
 ax.set_ylabel("By Size",fontsize=16)
+ax.set_zlabel("Time(us)",fontsize=16)
 fig.suptitle("Average Time", fontsize=26,fontweight='bold')
 
 i=0
 for x in range(0,15):
     for y in range(0,10):
         if y==0 :
-            ax.scatter(x_ticks[x], y_ticks[y], dictx[block_x[x]][block_y[y]], label="Bx:    "+str(block_x[x]) ,color=colors[i])
+            ax.scatter(x_ticks[x], y_ticks[y], dictx[block_x[x]][block_y[y]], label=str(block_x[x]) ,color=colors[i])
         else :
             ax.scatter(x_ticks[x], y_ticks[y], dictx[block_x[x]][block_y[y]],color=colors[i])
-        ax.legend()
+        ax.legend(bbox_to_anchor=(1.1, 0.9))
     i+=1
 
 mng = plt.get_current_fig_manager()
 mng.full_screen_toggle()
 
-# plt.savefig("plots/5.png")
-plt.show()
+plt.savefig("plots/5.png")
 
 
 #erotima 6
