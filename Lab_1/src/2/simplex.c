@@ -1,6 +1,6 @@
 /*@ begin PerfTuning (
  def build {
-   arg build_command = 'gcc -O0';
+   arg build_command = 'gcc -O0 -mcmodel=large';
  }
  def performance_params {
    param UF[] = range(1,33);
@@ -10,7 +10,7 @@
   arg repetitions = 10;
  }
  def input_params {
-   param N[] = [10000000];
+   param N[] = [100000000];
  }
  def input_vars {
    decl static double y[N] = random;

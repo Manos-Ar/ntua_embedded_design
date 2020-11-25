@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 int main()
 {
 	int i;
-	int N=100000000;
+	int N=100000000, time;
 	double *x1, *x2, *x3, *y;
 	double a1= 0.5;
 	double a2= 1;
@@ -36,10 +37,10 @@ int main()
 	*/
 
   gettimeofday(&ts,NULL);
-	for (i=0; i<=N-1; i++)
-	{
-		y[i] = y[i] + a1*x1[i] + a2*x2[i] + a3*x3[i];
-	}
+  for (i=0; i<=N-1; i++)
+  {
+    y[i] = y[i] + a1*x1[i] + a2*x2[i] + a3*x3[i];
+  }
   gettimeofday(&tf,NULL);
   time=(tf.tv_sec-ts.tv_sec)*1000000+(tf.tv_usec-ts.tv_usec);
   printf("%d\n",time);

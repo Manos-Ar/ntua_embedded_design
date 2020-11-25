@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 import sys
 import os
 from os import path
@@ -6,11 +6,10 @@ import subprocess
 import statistics
 import shutil
 
-exec=["tables_exhaustive", "tables_random", "tables_simplex"]
+exec=["tables", "tables_exhaustive", "tables_random", "tables_simplex"]
 
-if path.isdir("metrics/"):
-    shutil.rmtree("metrics/")
-os.mkdir("metrics")
+if not path.isdir("metrics/"):
+    os.mkdir("metrics")
 
 
 for e in exec:
