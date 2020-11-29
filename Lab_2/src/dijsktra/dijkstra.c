@@ -1,26 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include "dijkstra.h"
 
 #define NUM_NODES                          100
 #define NONE                               9999
 
-struct _NODE
-{
-  int iDist;
-  int iPrev;
-};
-typedef struct _NODE NODE;
+#if defined(SLL)
+  cdsl_sll *qHead;
+#elif defined(DLL)
+  cdsl_dll *qHead;
+#else
+  cdsl_dyn_array *qHead;
+#endif
 
-struct _QITEM
-{
-  int iNode;
-  int iDist;
-  int iPrev;
-  struct _QITEM *qNext;
-};
-typedef struct _QITEM QITEM;
-
-QITEM *qHead = NULL;
-             
 int AdjMatrix[NUM_NODES][NUM_NODES];
 
 int g_qCount = 0;
@@ -44,8 +36,7 @@ void print_path (NODE *rgnNodes, int chNode)
 void enqueue (int iNode, int iDist, int iPrev)
 {
   QITEM *qNew = (QITEM *) malloc(sizeof(QITEM));
-  QITEM *qLast = qHead;
-  
+
   if (!qNew) 
     {
       fprintf(stderr, "Out of memory.\n");
@@ -56,15 +47,7 @@ void enqueue (int iNode, int iDist, int iPrev)
   qNew->iPrev = iPrev;
   qNew->qNext = NULL;
   
-  if (!qLast) 
-    {
-      qHead = qNew;
-    }
-  else
-    {
-      while (qLast->qNext) qLast = qLast->qNext;
-      qLast->qNext = qNew;
-    }
+  qHead->enqueue(0,qHead,(void*)qNew);
   g_qCount++;
 
 }
@@ -72,15 +55,16 @@ void enqueue (int iNode, int iDist, int iPrev)
 
 void dequeue (int *piNode, int *piDist, int *piPrev)
 {
-  QITEM *qKill = qHead;
+  QITEM *qKill = (QITEM*) qHead->dequeue(0,qHead);
 
-  if (qHead)
+  
+
+  if (qKill)
     {
 	
-      *piNode = qHead->iNode;
-      *piDist = qHead->iDist;
-      *piPrev = qHead->iPrev;
-      qHead = qHead->qNext;
+      *piNode = qKill->iNode;
+      *piDist = qKill->iDist;
+      *piPrev = qKill->iPrev;
       free(qKill);
       g_qCount--;
     }
@@ -139,6 +123,16 @@ int dijkstra(int chStart, int chEnd)
     }
 }
 
+void init(){
+#if defined(SLL)
+  qHead=cdsl_sll_init();
+#elif defined(DLL)
+  qHead=cdsl_dll_init();
+#else
+  qHead=cdsl_dyn_array_init();
+#endif
+}
+
 int main(int argc, char *argv[]) {
   int i,j,k;
   FILE *fp;
@@ -160,6 +154,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  init();
   /* finds 10 shortest paths between nodes */
   for (i=0,j=NUM_NODES/2;i<20;i++,j++) {
 			j=j%NUM_NODES;
