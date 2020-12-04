@@ -2,29 +2,10 @@
         .global main
         .extern printf
         .extern scanf
+        b main
 
-main:
-        ldr r0, =prompt
-        bl printf
-        ldr r0, =format_input
-        ldr r1, =user_input
-        bl scanf
-get_full_input:
-        ldr r0, =format_char
-        ldr r1, =tmp
-        bl scanf
-        ldr r0, =tmp
-        ldrb r1, [r0, #0]
-        cmp r1, #10
-        bne get_full_input
-        ldr r0, =user_input
-        ldrb r1, [r0, #0]
-        cmp r1, #81
-        beq check_end
-        cmp r1, #113
-        beq check_end
 transform:
-        ldr r0, =user_input
+        push {r0-r7, lr}
 transform_begin:
         ldrb r1, [r0, #0]
         cmp r1, #0
@@ -57,11 +38,39 @@ transform_end:
         ldr r0, =format_string
         ldr r1, =user_input
         bl printf
+        pop {r0-r7, pc}
+
+
+main:
+        ldr r0, =prompt
+        bl printf
+        ldr r0, =format_input
+        ldr r1, =user_input
+        bl scanf
+get_full_input:
+        ldr r0, =format_char
+        ldr r1, =tmp
+        bl scanf
+        ldr r0, =tmp
+        ldrb r1, [r0, #0]
+        cmp r1, #10
+        bne get_full_input
+        ldr r0, =user_input
+        ldrb r1, [r0, #0]
+        cmp r1, #81
+        beq check_end
+        cmp r1, #113
+        beq check_end
+        ldr r0, =user_input
+        bl transform
         b main
 check_end:
         ldrb r1, [r0, #1]
         cmp r1, #0
-        bne transform
+        beq end
+        ldr r0, =user_input
+        bl transform
+        b main
 end:
         ldr r0, = exit_msg
         bl printf
