@@ -19,20 +19,19 @@ int main (int argc, char **argv){
     }
 
     device = argv[1];
-    printf("device: %s\n", device);
+    //printf("device: %s\n", device);
 
     printf("Please give a string to send to guest:\n");
     fgets(input, 64, stdin);
 
     fd = open(device, O_RDWR | O_NOCTTY | O_NONBLOCK);
-    printf("open: %d\n",O_RDWR | O_NOCTTY | O_NONBLOCK);
     if(fd == -1) {
          printf("Failed to open port\n");
          return 1;
     }
     fcntl(fd, F_SETFL, 0);
 
-    printf("fd : %d\n", fd);
+    //printf("fd : %d\n", fd);
 
     if(tcgetattr(fd, &options) < 0) {
         printf("Couldn't the information for the terminal associated with %s\n", device);
@@ -56,12 +55,12 @@ int main (int argc, char **argv){
         return 1;
     }
 
-	tcflush(fd, TCIOFLUSH);
+    tcflush(fd, TCIOFLUSH);
 
-	write(fd, input, 64);
+    write(fd, input, 64);
 
     while (read(fd, output, 64) <= 0);
-    printf("The most frequent character is \"%c\" and it appeared %d times.\n", output[0], output[1]);
+    printf("The most frequent character is \"%c\" and it appeared %d times.\n", output[0], output[2]);
     
     close(fd);
     return 0;
