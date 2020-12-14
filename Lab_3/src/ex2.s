@@ -28,32 +28,64 @@ main:
     ldr r1, [r1]
     bl printf
 
+    b _Read
 
-read:
+_Write:
     ldr r0, =fd
     ldr r0, [r0]
-    ldr r1, =input
-    mov r2, #64
-    bl read
+    ldr r1, =test
+    mov r2, #4
+    bl write
     //read(fd,input,64)
-    cmp r0, #0
-    blt read //rd=-1 => didnt read
+    //cmp r0, #0
+    //blt _Write //rd=-1 => didnt read
     
     mov r1, r0
-    ldr r0, =fd_str
-    bl printf
+    ldr r0, =wr
+    bl printf  
 
     mov r0, #0
     mov r7, #1
     swi 0
 
+
+_Read:
+    ldr r0, =fd
+    ldr r0, [r0]
+    ldr r1, =input
+    mov r2, #1
+    mov r7, #3
+    swi 0
+    //bl read
+    //read(fd,input,64)
+    cmp r0, #0
+    blt _Read //rd=-1 => didnt read
+    
+    mov r1, r0
+    ldr r0, =rd
+    bl printf
+
+    ldr r0, =input_str
+    ldr r1, =input
+    bl printf    
+//    b _Read
+//    b _Write
+    mov r0, #0
+    mov r7, #1
+   swi 0
+
 .data
         fd_str: .string "fd: %d\n" 
         rd: .string "read %d values\n"
+        wr: .string "wrote %d values\n"
+        input_str: .string "input: %s\n"
         device: .string "/dev/pts/0"
         fd : .word 0
-        .balign 1
-        input: .skip 64
+        test : .asciz "A" 
+ //       .balign 1
+ //       input: .skip 64
+	input: .word 0
+
         
 
 

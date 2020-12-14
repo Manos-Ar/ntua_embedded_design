@@ -51,8 +51,8 @@ int main (int argc, char **argv){
     
     int rd = -1;    
     while( rd < 0)
-        rd=read(fd, output, 12);
-
+        rd=read(fd, output, 4);
+    printf("rd : %d\n" , rd);
     printf("output: %s\n", output);
 
 
