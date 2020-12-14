@@ -1,21 +1,34 @@
 # SCP File Sharing
 
+
+### Start qemu
+```
+alias start-arm="qemu-system-arm -M versatilepb -kernel vmlinuz-3.2.0-4-versatile -initrd initrd.img-3.2.0-4-versatile -hda  debian_wheezy_armel_standard.qcow2 -append "root=/dev/sda1" -net nic -net user,hostfwd=tcp:127.0.0.1:22223-:22"
+```
+
+serial port option
+```
+-serial pty
+```
+
 ### Local -> arm (
 
 From the `src` directory on local to transfer the `src` directory on remote:
 
-Delete `src` to  remote before scp
 
 ```
-scp -P 22223 -r . root@localhost:/root/src
+rsync -vr -e "ssh -p 22223" . root@localhost:/root/src
 ```
-
+To delete target files before sent
+```
+--delete
+```
 
 ### arm -> Local 
 From the `src` directory on local to transfer the `src` directory on remote:
 
 ```
-scp -P 22223 -r /src root@localhost:/root/src /home/manos/Desktop
+rsync -vr -e "ssh -p 22223" root@localhost:/root/src/ .
 ```
 
 To connect without root password (host):
@@ -23,5 +36,3 @@ To connect without root password (host):
 ssh-copy-id -p 22223 root@localhost
 ```
 
-
-rsync --delete -vrPe "ssh -p 22223" ./src  root@localhost:/root
