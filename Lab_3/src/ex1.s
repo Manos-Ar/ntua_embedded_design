@@ -117,6 +117,8 @@ end:
         format_char: .string "%c"
         prompt: .string "Input a string of up to 32 chars long: "
         result: .string "Result is: "
+    	.balign 1
+        user_input: .skip 33
         exit_msg: .string "Exiting....\n\n"
         tmp: .asciz "7"
-        user_input: .word 33
+        

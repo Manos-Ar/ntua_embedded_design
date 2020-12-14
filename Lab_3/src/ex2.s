@@ -18,15 +18,14 @@ main:
     
     mov r1, r0     //r1 = O_RDWR | O_NOCTTY | O_NONBLOCK
     ldr r0, =device //r0 = "/dev/pts/0"
-    ldr r2,=0666 
     bl open
     //r0 = fd
     ldr r1, =fd  
     str r0, [r1]
 
     ldr r0, =fd_str
-    ldr r2, =fd
-    ldr r1, [r2]
+    ldr r1, =fd
+    ldr r1, [r1]
     bl printf
 
 
@@ -38,10 +37,10 @@ read:
     bl read
     //read(fd,input,64)
     cmp r0, #0
-    bl read //rd=-1 => didnt read
+    blt read //rd=-1 => didnt read
     
     mov r1, r0
-    ldr r0, =output_str
+    ldr r0, =fd_str
     bl printf
 
     mov r0, #0

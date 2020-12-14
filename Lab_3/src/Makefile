@@ -1,4 +1,4 @@
-quest: ex1 ex2
+guest: ex1 ex2
 ex1: ex1.s
 	gcc -Wall -o ex1.out ex1.s
 
