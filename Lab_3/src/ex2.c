@@ -61,7 +61,7 @@ int main (int argc, char **argv){
 	write(fd, input, 64);
 
     while (read(fd, output, 64) <= 0);
-    printf("The most frequent character is \"%c\" and it appeared %d times.\n", output[0], output[2]);
+    printf("The most frequent character is \"%c\" and it appeared %d times.\n", output[0], output[1]);
     
     close(fd);
     return 0;
