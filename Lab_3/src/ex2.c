@@ -25,6 +25,7 @@ int main (int argc, char **argv){
     fgets(input, 64, stdin);
 
     fd = open(device, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    printf("open: %d\n",O_RDWR | O_NOCTTY | O_NONBLOCK);
     if(fd == -1) {
          printf("Failed to open port\n");
          return 1;
