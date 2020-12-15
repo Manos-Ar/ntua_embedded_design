@@ -29,7 +29,6 @@ int main (int argc, char **argv){
          printf("Failed to open port\n");
          return 1;
     }
-    fcntl(fd, F_SETFL, 0);
 
     //printf("fd : %d\n", fd);
 
@@ -38,12 +37,7 @@ int main (int argc, char **argv){
         return 1;
     }
 
-    cfmakeraw(&options);
     options.c_lflag |= ICANON;
-    options.c_cflag |= (CLOCAL | CREAD);
-    options.c_cflag &= ~CSTOPB;
-    options.c_cc[VMIN] = 5;
-    options.c_cc[VTIME] = 255;
 
     if(cfsetispeed(&options, B9600) < 0 || cfsetospeed(&options, B9600) < 0) {
         printf("Couldn't set communication speed\n");
@@ -55,8 +49,11 @@ int main (int argc, char **argv){
         return 1;
     }
 
+
     tcflush(fd, TCIOFLUSH);
 
+    // printf("c_iflag: %x, c_oflag: %x, c_lflag: %x, c_cflag: %x\n", 
+    //         options.c_iflag, options.c_oflag, options.c_lflag, options.c_cflag);
     write(fd, input, 64);
 
     while (read(fd, output, 64) <= 0);
