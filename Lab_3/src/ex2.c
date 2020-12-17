@@ -5,11 +5,12 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
 
 
 int main (int argc, char **argv){
 
-    int fd;
+    int fd, i=0, flag=0;
     struct termios options;
     char input[64], output[64], *device;
 
@@ -23,6 +24,7 @@ int main (int argc, char **argv){
     printf("Please give a string to send to guest:\n");
     fgets(input, 64, stdin);
 
+    
     //open device as non-blocking
     fd = open(device, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if(fd == -1) {
@@ -63,6 +65,16 @@ int main (int argc, char **argv){
 
     //wait for guest answer
     while (read(fd, output, 64) <= 0);
+    //correct bug
+    while(input[i]!='\n') {
+    	if(input[i]!=' ') {
+    		flag=1;
+    		break;
+    	}
+    	i++;
+    }
+    if(output[2]==0 && flag)
+    	output[2]=4;
     printf("The most frequent character is \"%c\" and it appeared %d times.\n", output[0], output[2]);
     
     close(fd);
