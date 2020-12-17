@@ -11,75 +11,95 @@
 
 
 main:
-    ldr r0, =device /* device to open */
-    ldr r1, =#258 /* permissions blocking */
+	//r0 = "/dev/ttyAMA0"
+    ldr r0, =device
+    //r1 = O_RDWR | O_NOCTTY
+    ldr r1, =#258
+    //r0 = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY)
     bl open
-    /* now r0 has the fd */
-    mov r6, r0 /* save for later */
-
-    mov r0, r6 /* call tclsetattr to set the settings for our port */
+    //r6 = fd
+    mov r6, r0
+    //apply options
+    //tcsetattr(fd, 0, &options)
+    mov r0, r6
     mov r1, #0
     ldr r2, =options
     bl tcsetattr
-
+    //read host message
+    //read(fd, input, 64)
     mov r0, r6
     ldr r1, =input
     mov r2, #64
     bl read
-
+    //initialize times
+    //r0 = times
     ldr r0, =times
+    //index = 0
     mov r1, #0
-init_times:
+    //r2 = 0
     mov r2, #0
+init_times:
+	//times[index] = 0
     strb r2, [r0, r1]
+    //index++
     add r1, #1
+    //if(index!=256) go to init_times
     cmp r1, #256
     bne init_times
-
+    //r0 = input
     ldr r0, =input
+    //r1 = times
     ldr r1, =times
+    //index = 0
     mov r2, #0
-    
-_Iterate_input:    
-    ldrb r3, [r0, r2] //r3 = character input
-
+_Iterate_input:
+	//r3 = input[index]
+    ldrb r3, [r0, r2]
+    //if(r3=='\n') go to next 
     cmp r3, #10
     beq next
-
+    //if(r3==' ') go to _Icrease_counter
     cmp r3, #32
     beq _Icrease_counter
-
+    //times[r3]++
     ldrb r4, [r1, r3]
     add r4, #1
     strb r4, [r1, r3]
-
 _Icrease_counter:
+	//index++
     add r2, #1
+    //go to _Iterate_input
     b _Iterate_input
 next:
     mov r0, #-1  //max
     mov r2, #0  //char
     mov r3, #0  // index
-    //r4 = tmp
 _Find_max:
+	//r4 = times[index]
     ldrb r4, [r1, r3]
-
+    //if(max<r4) max=r4, char=r3
     cmp r0, r4
     movlt r0, r4
     movlt r2, r3
+    //index++
     add r3, #1
+    //if(index!=256) go to _Find_max
     cmp r3, #256
     bne _Find_max
+    //res[0] = char
+    //res[2] = max
     ldr r3, =res
     strb r2, [r3]
     strb r0, [r3, #2]
-    
+    //write(fd, res, len_res)
     mov r0, r6
     ldr r1, =res
     ldr r2, =len_res 
     bl write
+    //close(fd)
     mov r0, r6
     bl close
+    //return 0
     mov r0, #0
     mov r7, #1
     swi 0
